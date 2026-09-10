@@ -122,14 +122,17 @@ export default function App() {
             id="desktop-top-header"
             className="hidden md:flex w-full h-14 px-6 md:px-8 items-center justify-end shrink-0 bg-[#FFFFFF] border-none sticky top-0 z-20"
           >
-            <button
+            <a
               id="btn-desktop-topbar-link"
-              onClick={handleLinkClick}
-              aria-label="Scanner Hardware Link"
+              href="https://github.com/tandonrishav18/Be-"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub Repository Link"
+              title="https://github.com/tandonrishav18/Be-"
               className="w-10 h-10 rounded-full flex items-center justify-center text-[#201A19] hover:text-[#8A0000] active:text-[#8A0000] focus:text-[#8A0000] hover:bg-[#FAF2F0] active:scale-95 transition-all duration-150 cursor-pointer"
             >
-              <M3Icon name="link_2" size={24} className="w-5 h-5" />
-            </button>
+              <M3Icon name="link" size={24} className="w-5 h-5" />
+            </a>
           </header>
 
           {/* Dynamic Screen Viewport Area */}

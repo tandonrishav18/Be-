@@ -4,6 +4,7 @@ import {
   FlaskConical, 
   FileText, 
   User, 
+  Link as LinkIcon,
   Link2, 
   ArrowLeft, 
   Check, 
@@ -74,8 +75,9 @@ export const FallbackIcon: React.FC<{ name: string; size?: number; className?: s
       return <User size={size} className={className} />;
     case 'chevron_right':
       return <ChevronRight size={size} className={className} />;
-    case 'link_2':
     case 'link':
+      return <LinkIcon size={size} className={className} />;
+    case 'link_2':
       return <Link2 size={size} className={className} />;
     case 'arrow_back':
       return <ArrowLeft size={size} className={className} />;

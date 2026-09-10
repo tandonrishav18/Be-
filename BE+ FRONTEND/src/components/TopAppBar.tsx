@@ -66,16 +66,20 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
           </div>
         </div>
 
-        {/* Right Icon Button (touch target: link_2, strictly centered vertically) */}
+        {/* Right Icon Button (touch target: link, strictly centered vertically) */}
         <div className="flex items-center h-full">
-          <button
+          <a
             id="btn-topbar-link"
-            onClick={onLinkClick}
-            aria-label="Scanner Hardware Link"
+            href="https://github.com/tandonrishav18/Be-"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onLinkClick ? (e) => { /* allow standard navigation or handler */ } : undefined}
+            aria-label="GitHub Repository Link"
+            title="https://github.com/tandonrishav18/Be-"
             className="w-12 h-12 md:w-10 md:h-10 rounded-full flex items-center justify-center text-[#201A19] hover:text-[#8A0000] active:text-[#8A0000] focus:text-[#8A0000] hover:bg-[#FAF2F0] active:scale-95 transition-all duration-150 cursor-pointer"
           >
-            <M3Icon name="link_2" size={24} className="md:w-5 md:h-5" />
-          </button>
+            <M3Icon name="link" size={24} className="md:w-5 md:h-5" />
+          </a>
         </div>
       </div>
     </header>
