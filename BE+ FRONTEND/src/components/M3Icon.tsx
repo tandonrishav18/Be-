@@ -36,12 +36,48 @@ interface M3IconProps {
   className?: string;
 }
 
+export const TiltedLinkIcon: React.FC<{ size?: number; className?: string; strokeWidth?: number }> = ({
+  size = 24,
+  className = '',
+  strokeWidth = 2.25
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <g transform="rotate(-45 12 12)">
+      <path d="M9 17H7A5 5 0 0 1 7 7h2" />
+      <path d="M15 7h2a5 5 0 1 1 0 10h-2" />
+      <line x1="8" y1="12" x2="16" y2="12" />
+    </g>
+  </svg>
+);
+
 export const M3Icon: React.FC<M3IconProps> = ({ 
   name, 
   filled = false, 
   size = 24, 
   className = '' 
 }) => {
+  if (name === 'link' || name === 'link_2') {
+    return (
+      <span 
+        className={`inline-flex items-center justify-center select-none ${className}`}
+        style={{ width: size, height: size }}
+      >
+        <TiltedLinkIcon size={size} />
+      </span>
+    );
+  }
+
   // Try to render standard Material Symbols Rounded font icon
   // with fallback to lucide-react icon
   return (
@@ -76,9 +112,8 @@ export const FallbackIcon: React.FC<{ name: string; size?: number; className?: s
     case 'chevron_right':
       return <ChevronRight size={size} className={className} />;
     case 'link':
-      return <LinkIcon size={size} className={className} />;
     case 'link_2':
-      return <Link2 size={size} className={className} />;
+      return <TiltedLinkIcon size={size} className={className} />;
     case 'arrow_back':
       return <ArrowLeft size={size} className={className} />;
     case 'check':
