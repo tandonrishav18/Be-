@@ -2,6 +2,8 @@
 
 A full-stack, AI-powered biometric application that classifies human blood groups (**A+, A-, B+, B-, AB+, AB-, O+, O-**) using dermatoglyphic fingerprint analysis with a **ResNet34 Deep Learning Model**.
 
+LINK : https://be-plus-frontend.vercel.app/
+
 ---
 
 ## 🌟 Features
