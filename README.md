@@ -73,8 +73,7 @@ python fingerprint-based-blood-group-detection/server.py
 cd "BE+ FRONTEND" && npm run dev
 ```
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000/health
+- **Frontend**: https://be-plus-frontend.vercel.app/
 
 ---
 
