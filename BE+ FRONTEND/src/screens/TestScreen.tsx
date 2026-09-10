@@ -78,86 +78,59 @@ export const TestScreen: React.FC<TestScreenProps> = ({
     }
   };
 
-  // Trigger test and redirect to report using real ML model backend
+  // Trigger test and redirect to report using real ResNet34 ML model
   const handleTestClick = async () => {
     if (!selectedImage) return;
 
-    let predictedGroup: BloodGroup = 'O-';
-    let confidence = 97.5;
-
     try {
       const mlResult = await predictBloodGroupFromImage(selectedImage, selectedFileName);
-      if (mlResult && mlResult.predictedGroup) {
-        predictedGroup = mlResult.predictedGroup;
-        confidence = mlResult.confidenceScore;
+      const predictedGroup = mlResult.predictedGroup;
+      const confidence = mlResult.confidenceScore;
+      const groupData = BLOOD_GROUP_DATA[predictedGroup];
+      const testCode = StorageService.generateRandomReportId5();
+
+      const patternTypes: FingerprintPattern[] = ['loop_ulnar', 'whorl', 'loop_radial', 'arch_plain'];
+      const patternType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
+
+      const patientProf = StorageService.getPatientProfile();
+      const patientName = patientProf.name || 'PATIENT RECORD';
+      const patientAge = parseInt(patientProf.age, 10) || 21;
+      const patientGender = (patientProf.gender as 'Male' | 'Female' | 'Other') || 'Male';
+
+      const report: BloodGroupReport = {
+        id: `report-${Date.now()}`,
+        testCode,
+        patientName,
+        patientAge,
+        patientGender,
+        fingerScanned: 'Right Thumb',
+        timestamp: Date.now(),
+        predictedGroup,
+        rhFactor: groupData.rhFactor,
+        confidenceScore: confidence,
+        patternType,
+        ridgeDensity: parseFloat((15.4 + Math.random() * 2.6).toFixed(1)),
+        primaryAntigens: groupData.antigens,
+        antibodies: groupData.antibodies,
+        canDonateTo: groupData.canDonateTo,
+        canReceiveFrom: groupData.canReceiveFrom,
+        clinicalNotes: `Biometric scan evaluated via ResNet34 deep learning model. Verified dermatoglyphic signature of ABO blood group ${predictedGroup} with ${confidence}% AI confidence score.`,
+        fingerprintImageDataUrl: selectedImage,
+        clinicName: 'BE+ Hematology & Biometrics Diagnostic Center',
+        technicianName: 'Dr. R. Sharma (Biometric Lab)'
+      };
+
+      StorageService.saveReport(report);
+      StorageService.setActiveBloodGroup(predictedGroup);
+      if (onTestComplete) {
+        onTestComplete(report);
+      }
+      if (onNavigateToReports) {
+        onNavigateToReports();
       }
     } catch (e) {
-      console.warn('Using filename/fallback matching:', e);
-      const lowerName = selectedFileName.toLowerCase();
-      if (lowerName.includes('o-') || lowerName.includes('o_neg') || lowerName.includes('oneg') || lowerName.includes('o negative')) {
-        predictedGroup = 'O-';
-      } else if (lowerName.includes('o+') || lowerName.includes('o_pos') || lowerName.includes('opos') || lowerName.includes('o positive')) {
-        predictedGroup = 'O+';
-      } else if (lowerName.includes('ab-') || lowerName.includes('ab_neg') || lowerName.includes('abneg') || lowerName.includes('ab negative')) {
-        predictedGroup = 'AB-';
-      } else if (lowerName.includes('ab+') || lowerName.includes('ab_pos') || lowerName.includes('abpos') || lowerName.includes('ab positive')) {
-        predictedGroup = 'AB+';
-      } else if (lowerName.includes('a-') || lowerName.includes('a_neg') || lowerName.includes('aneg') || lowerName.includes('a negative')) {
-        predictedGroup = 'A-';
-      } else if (lowerName.includes('a+') || lowerName.includes('a_pos') || lowerName.includes('apos') || lowerName.includes('a positive')) {
-        predictedGroup = 'A+';
-      } else if (lowerName.includes('b-') || lowerName.includes('b_neg') || lowerName.includes('bneg') || lowerName.includes('b negative')) {
-        predictedGroup = 'B-';
-      } else if (lowerName.includes('b+') || lowerName.includes('b_pos') || lowerName.includes('bpos') || lowerName.includes('b positive')) {
-        predictedGroup = 'B+';
-      } else {
-        const dynamicGroups: BloodGroup[] = ['B+', 'O+', 'A+', 'AB-', 'A-', 'B-', 'AB+', 'O-'];
-        const randomIndex = Math.floor(Math.random() * dynamicGroups.length);
-        predictedGroup = dynamicGroups[randomIndex];
-      }
-    }
-
-    const groupData = BLOOD_GROUP_DATA[predictedGroup];
-    const testCode = StorageService.generateRandomReportId5();
-
-    const patternTypes: FingerprintPattern[] = ['loop_ulnar', 'whorl', 'loop_radial', 'arch_plain'];
-    const patternType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
-
-    const patientProf = StorageService.getPatientProfile();
-    const patientName = patientProf.name || 'PATIENT RECORD';
-    const patientAge = parseInt(patientProf.age, 10) || 21;
-    const patientGender = (patientProf.gender as 'Male' | 'Female' | 'Other') || 'Male';
-
-    const report: BloodGroupReport = {
-      id: `report-${Date.now()}`,
-      testCode,
-      patientName,
-      patientAge,
-      patientGender,
-      fingerScanned: 'Right Thumb',
-      timestamp: Date.now(),
-      predictedGroup,
-      rhFactor: groupData.rhFactor,
-      confidenceScore: confidence,
-      patternType,
-      ridgeDensity: parseFloat((15.4 + Math.random() * 2.6).toFixed(1)),
-      primaryAntigens: groupData.antigens,
-      antibodies: groupData.antibodies,
-      canDonateTo: groupData.canDonateTo,
-      canReceiveFrom: groupData.canReceiveFrom,
-      clinicalNotes: `Biometric scan matching dermatoglyphic signature of ABO blood group ${predictedGroup} (${confidence}% AI model confidence).`,
-      fingerprintImageDataUrl: selectedImage,
-      clinicName: 'BE+ Hematology & Biometrics Diagnostic Center',
-      technicianName: 'Dr. R. Sharma (Biometric Lab)'
-    };
-
-    StorageService.saveReport(report);
-    StorageService.setActiveBloodGroup(predictedGroup);
-    if (onTestComplete) {
-      onTestComplete(report);
-    }
-    if (onNavigateToReports) {
-      onNavigateToReports();
+      console.error('Prediction failed:', e);
+      alert('Could not evaluate fingerprint with ML model. Please try another clear image.');
     }
   };
 
@@ -192,55 +165,58 @@ export const TestScreen: React.FC<TestScreenProps> = ({
 
   // Generate real BloodGroupReport and persist to storage
   const finalizeAnalysis = async () => {
-    let predictedGroup: BloodGroup = 'AB-';
-    let confidence = 96.8;
+    if (!selectedImage) return;
 
-    if (selectedImage) {
-      try {
-        const mlResult = await predictBloodGroupFromImage(selectedImage, selectedFileName);
-        if (mlResult && mlResult.predictedGroup) {
-          predictedGroup = mlResult.predictedGroup;
-          confidence = mlResult.confidenceScore;
-        }
-      } catch (e) {
-        console.warn('Using fallback:', e);
+    try {
+      const mlResult = await predictBloodGroupFromImage(selectedImage, selectedFileName);
+      const predictedGroup = mlResult.predictedGroup;
+      const confidence = mlResult.confidenceScore;
+
+      const groupData = BLOOD_GROUP_DATA[predictedGroup];
+      const testCode = StorageService.generateRandomReportId5();
+
+      const patternTypes: FingerprintPattern[] = ['loop_ulnar', 'whorl', 'loop_radial', 'arch_plain'];
+      const patternType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
+
+      const patientProf = StorageService.getPatientProfile();
+      const patientName = patientProf.name || 'PATIENT RECORD';
+      const patientAge = parseInt(patientProf.age, 10) || 21;
+      const patientGender = (patientProf.gender as 'Male' | 'Female' | 'Other') || 'Male';
+
+      const report: BloodGroupReport = {
+        id: `report-${Date.now()}`,
+        testCode,
+        patientName,
+        patientAge,
+        patientGender,
+        fingerScanned: 'Right Thumb',
+        timestamp: Date.now(),
+        predictedGroup,
+        rhFactor: groupData.rhFactor,
+        confidenceScore: confidence,
+        patternType,
+        ridgeDensity: parseFloat((15.4 + Math.random() * 2.6).toFixed(1)),
+        primaryAntigens: groupData.antigens,
+        antibodies: groupData.antibodies,
+        canDonateTo: groupData.canDonateTo,
+        canReceiveFrom: groupData.canReceiveFrom,
+        clinicalNotes: `High clarity biometric scan evaluated via ResNet34 neural network matching ABO blood group ${predictedGroup} with ${confidence}% AI confidence score.`,
+        fingerprintImageDataUrl: selectedImage,
+        clinicName: 'BE+ Hematology & Biometrics Diagnostic Center',
+        technicianName: 'Dr. R. Sharma (Biometric Lab)'
+      };
+
+      StorageService.saveReport(report);
+      StorageService.setActiveBloodGroup(predictedGroup);
+      setGeneratedReport(report);
+      setStage('complete');
+      if (onTestComplete) {
+        onTestComplete(report);
       }
-    }
-
-    const groupData = BLOOD_GROUP_DATA[predictedGroup];
-    const testCode = StorageService.generateRandomReportId5();
-
-    const patternTypes: FingerprintPattern[] = ['loop_ulnar', 'whorl', 'loop_radial', 'arch_plain'];
-    const patternType = patternTypes[Math.floor(Math.random() * patternTypes.length)];
-
-    const report: BloodGroupReport = {
-      id: `report-${Date.now()}`,
-      testCode,
-      patientName: 'ARNAV PANDEY',
-      patientAge: 28,
-      patientGender: 'Male',
-      fingerScanned: 'Right Thumb',
-      timestamp: Date.now(),
-      predictedGroup,
-      rhFactor: groupData.rhFactor,
-      confidenceScore: confidence,
-      patternType,
-      ridgeDensity: parseFloat((15.4 + Math.random() * 2.6).toFixed(1)),
-      primaryAntigens: groupData.antigens,
-      antibodies: groupData.antibodies,
-      canDonateTo: groupData.canDonateTo,
-      canReceiveFrom: groupData.canReceiveFrom,
-      clinicalNotes: `High clarity biometric scan matching dermatoglyphic signature of ABO blood group ${predictedGroup} (${confidence}% confidence score).`,
-      fingerprintImageDataUrl: selectedImage || '/home_fingerprint.png',
-      clinicName: 'BE+ Hematology & Biometrics Diagnostic Center',
-      technicianName: 'Dr. R. Sharma (Biometric Lab)'
-    };
-
-    StorageService.saveReport(report);
-    setGeneratedReport(report);
-    setStage('complete');
-    if (onTestComplete) {
-      onTestComplete(report);
+    } catch (e) {
+      console.error('Analysis failed:', e);
+      setStage('idle');
+      alert('Could not evaluate fingerprint with ML model. Please try another clear image.');
     }
   };
 

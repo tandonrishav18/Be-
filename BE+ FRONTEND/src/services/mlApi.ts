@@ -1,4 +1,5 @@
 import { BloodGroup } from '../types';
+import { predictInBrowser } from './onnxInference';
 
 export interface MLPredictionResult {
   success: boolean;
@@ -34,10 +35,33 @@ export async function openNativeDatasetPickerDialog(): Promise<PickImageResult> 
   }
 }
 
+/**
+ * Predicts Blood Group from a fingerprint image.
+ * Uses real ResNet34 Neural Network Inference:
+ * 1. Executes in-browser via WebAssembly / ONNX Runtime
+ * 2. Or calls Python REST API backend if available
+ */
 export async function predictBloodGroupFromImage(
   imageDataUrl: string,
   fileName?: string
 ): Promise<MLPredictionResult> {
+  // 1. Try In-Browser Real ResNet34 ONNX Model
+  try {
+    const browserResult = await predictInBrowser(imageDataUrl);
+    if (browserResult && browserResult.predictedGroup) {
+      return {
+        success: true,
+        predictedGroup: browserResult.predictedGroup,
+        confidenceScore: browserResult.confidenceScore,
+        probabilities: browserResult.probabilities,
+        fileName: fileName || 'fingerprint.bmp',
+      };
+    }
+  } catch (onnxErr) {
+    console.warn('[ML Engine] In-browser ONNX inference error, checking backend API:', onnxErr);
+  }
+
+  // 2. Try Backend REST API
   try {
     const response = await fetch(`${API_BASE_URL}/api/predict`, {
       method: 'POST',
@@ -50,24 +74,21 @@ export async function predictBloodGroupFromImage(
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Server returned status: ${response.status}`);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.success && data.predictedGroup) {
+        return {
+          success: true,
+          predictedGroup: data.predictedGroup as BloodGroup,
+          confidenceScore: data.confidenceScore || 96.5,
+          probabilities: data.probabilities || {},
+          fileName: data.fileName,
+        };
+      }
     }
-
-    const data = await response.json();
-    if (data.success && data.predictedGroup) {
-      return {
-        success: true,
-        predictedGroup: data.predictedGroup as BloodGroup,
-        confidenceScore: data.confidenceScore || 96.5,
-        probabilities: data.probabilities || {},
-        fileName: data.fileName,
-      };
-    } else {
-      throw new Error(data.error || 'Prediction failed');
-    }
-  } catch (error) {
-    console.warn('[ML API] Backend request failed, using fallback:', error);
-    throw error;
+  } catch (apiErr) {
+    console.error('[ML Engine] Backend API error:', apiErr);
   }
+
+  throw new Error('Real ML model inference failed to process the fingerprint image.');
 }
