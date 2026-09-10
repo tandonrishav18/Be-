@@ -1,0 +1,6 @@
+{
+  "name": "BE+ Blood Group Detection",
+  "description": "Material 3 Expressive Android application for AI-assisted blood group prediction from fingerprint biometrics with clinical reports and history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

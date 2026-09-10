@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  /* Material 3 Expressive Theme Tokens */
+  --m3-primary: #8A0000;
+  --m3-on-primary: #FFFFFF;
+  --m3-primary-container: #A2240B;
+  --m3-on-primary-container: #FFFFFF;
+
+  --m3-secondary: #7D544B;
+  --m3-secondary-container: #8A0000;
+  --m3-on-secondary-container: #FFFFFF;
+  --m3-tertiary-container: #FFFCF0;
+  --m3-on-tertiary-container: #1D1C13;
+
+  --m3-surface: #FFF8F6;
+  --m3-surface-container-low: #FAF2F0;
+  --m3-surface-container: #FFFFFF;
+  --m3-surface-container-high: #FFFFFF;
+  --m3-surface-container-highest: #E9E1DF;
+
+  --m3-on-surface: #201A19;
+  --m3-on-surface-variant: #524440;
+  --m3-outline: #847470;
+  --m3-outline-variant: #D4C3BF;
+
+  --m3-inverse-surface: #000000;
+  --m3-inverse-on-surface: #FFFFFF;
+  --m3-inverse-primary: #FFB4A4;
+
+  --m3-error: #B3261E;
+  --m3-on-error: #FFFFFF;
+  --m3-error-container: #F9DEDC;
+  --m3-on-error-container: #410E0B;
+
+  /* Standard Motion Scheme (smooth, no bounce) */
+  --m3-motion-standard-easing: cubic-bezier(0.2, 0.0, 0, 1.0);
+  --m3-motion-duration-short: 200ms;
+  --m3-motion-duration-medium: 350ms;
+  --m3-motion-duration-long: 500ms;
+}
+
+body {
+  font-family: 'Roboto Serif', Georgia, serif;
+  background-color: var(--m3-surface-container-low);
+  color: var(--m3-on-surface);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.font-alkatra {
+  font-family: 'Alkatra', system-ui, -apple-system, sans-serif;
+}
+
+/* Material Symbols Rounded glyphs */
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-rounded.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-rounded.outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* M3 Press-Scale & Ripple Transitions */
+.m3-tappable {
+  transition: transform 150ms var(--m3-motion-standard-easing), opacity 150ms var(--m3-motion-standard-easing), background-color 150ms var(--m3-motion-standard-easing);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.m3-tappable:active {
+  transform: scale(0.97);
+}
+
+/* Android Navigation Bar Inset & Status Bar */
+.android-status-bar {
+  height: 38px;
+  background-color: var(--m3-surface);
+}
+
+.android-gesture-handle {
+  width: 108px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: #201A19;
+  opacity: 0.25;
+}
+
+/* Custom scrollbars that look native and unobtrusive */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4C3BF;
+  border-radius: 4px;
+}

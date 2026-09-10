@@ -1,0 +1,26 @@
+# Environments
+venv_tf/
+.venv/
+env/
+venv/
+
+# Node dependencies & build
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.env
+.env.local
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
